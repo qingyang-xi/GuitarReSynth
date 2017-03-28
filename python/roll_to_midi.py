@@ -7,9 +7,9 @@ import matplotlib.pyplot as plt
 
 
 
-onset_time = sio.loadmat('./saved_mats/onset_time.mat')['onset_time']
-chunked_roll = sio.loadmat('./saved_mats/chunked_roll.mat')['chunked_roll']
-length_of_piece = 26;
+onset_time = sio.loadmat('./saved_mats/onset_time1.mat')['onset_time']
+chunked_roll = sio.loadmat('./saved_mats/chunked_roll1.mat')['chunked_roll']
+length_of_piece = 30;
 
 # add the ending time of the last note into the roll.
 onset_time = np.append(onset_time,length_of_piece)
@@ -18,7 +18,10 @@ chunked_roll = np.append(chunked_roll, np.zeros((chunked_roll.shape[0],1)), axis
 
 def get_pitch_velocity(salience):
     # get from salience number to velocity number
-    return int(math.floor(salience ** 0.5 * 127))
+    output = int(math.floor(salience ** 0.5 * 127))
+    if output > 127:
+        output = 127;
+    return output
 
 def get_pitch_dict(onset_idx, chunked_roll):
     # get the non-zero entries of a column of chunked_roll, with salience being the value
@@ -40,7 +43,7 @@ def get_end_time(onset_idx, pitch, chunked_roll, onset_time):
     '''
     noteOff_idx = onset_idx + 1
     while True:
-        if chunked_roll[pitch, noteOff_idx] == 0:
+        if chunked_roll[pitch, noteOff_idx] < 0.0000000001:
             end_time = onset_time[noteOff_idx]
             break
         elif chunked_roll[pitch, noteOff_idx] < chunked_roll[pitch, onset_idx]: 
